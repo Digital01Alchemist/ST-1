@@ -14,17 +14,17 @@ bool checkPrime(uint64_t value) {
 }
 
 uint64_t nPrime(uint64_t n) {
-   if (n == 0) {
+    if (n == 0) {
         throw std::invalid_argument("n must be > 0");
-  }
-  if (n == 1) return 2;
-  uint64_t count = 1;
-  uint64_t candidate = 3;
-  while (count < n) {
-    if (checkPrime(candidate)) count++;
-    if (count < n) candidate += 2;
-  }
-  return candidate;
+    }
+    if (n == 1) return 2;
+    uint64_t count = 1;
+    uint64_t candidate = 3;
+    while (count < n) {
+        if (checkPrime(candidate)) count++;
+        if (count < n) candidate += 2;
+    }
+    return candidate;
 }
 
 uint64_t nextPrime(uint64_t value) {
