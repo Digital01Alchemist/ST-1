@@ -16,7 +16,7 @@ bool checkPrime(uint64_t value) {
 uint64_t nPrime(uint64_t n) {
    if (n == 0) {
         throw std::invalid_argument("n must be > 0");
-    }
+  }
   if (n == 1) return 2;
   uint64_t count = 1;
   uint64_t candidate = 3;
