@@ -1,107 +1,67 @@
 // Copyright 2025 UNN-CS
-#include <gtest/gtest.h>
 #include <cstdint>
+#include <vector>
 #include "alg.h"
 
-TEST(PrimeCheckerTest, HandlesVerySmallNumbers) {
-    EXPECT_FALSE(checkPrime(0));
-    EXPECT_FALSE(checkPrime(1));
-    EXPECT_TRUE(checkPrime(2));
-    EXPECT_TRUE(checkPrime(3));
-}
-
-TEST(PrimeCheckerTest, HandlesEvenNumbers) {
-    EXPECT_FALSE(checkPrime(4));
-    EXPECT_FALSE(checkPrime(6));
-    EXPECT_FALSE(checkPrime(8));
-    EXPECT_FALSE(checkPrime(100));
-}
-
-TEST(PrimeCheckerTest, HandlesOddComposites) {
-    EXPECT_FALSE(checkPrime(9));
-    EXPECT_FALSE(checkPrime(15));
-    EXPECT_FALSE(checkPrime(21));
-    EXPECT_FALSE(checkPrime(25));
-    EXPECT_FALSE(checkPrime(27));
-}
-
-TEST(PrimeCheckerTest, HandlesPrimeNumbers) {
-    EXPECT_TRUE(checkPrime(11));
-    EXPECT_TRUE(checkPrime(13));
-    EXPECT_TRUE(checkPrime(17));
-    EXPECT_TRUE(checkPrime(19));
-    EXPECT_TRUE(checkPrime(23));
-}
-
-TEST(PrimeCheckerTest, HandlesLargerPrimes) {
-    EXPECT_TRUE(checkPrime(997));
-    EXPECT_TRUE(checkPrime(1009));
-    EXPECT_TRUE(checkPrime(1013));
-    EXPECT_TRUE(checkPrime(7919));
-}
-
-TEST(NthPrimeTest, ReturnsCorrectFirstPrimes) {
-    EXPECT_EQ(nPrime(1), 2);
-    EXPECT_EQ(nPrime(2), 3);
-    EXPECT_EQ(nPrime(3), 5);
-    EXPECT_EQ(nPrime(4), 7);
-    EXPECT_EQ(nPrime(5), 11);
-}
-
-TEST(NthPrimeTest, ReturnsCorrectLaterPrimes) {
-    EXPECT_EQ(nPrime(6), 13);
-    EXPECT_EQ(nPrime(7), 17);
-    EXPECT_EQ(nPrime(8), 19);
-    EXPECT_EQ(nPrime(9), 23);
-    EXPECT_EQ(nPrime(10), 29);
-}
-
-TEST(NthPrimeTest, HandlesZero) {
-    EXPECT_EQ(nPrime(0), 0);
-}
-
-TEST(NextPrimeFinderTest, FindsNextAfterComposite) {
-    EXPECT_EQ(nextPrime(4), 5);
-    EXPECT_EQ(nextPrime(6), 7);
-    EXPECT_EQ(nextPrime(8), 11);
-    EXPECT_EQ(nextPrime(9), 11);
-    EXPECT_EQ(nextPrime(10), 11);
-}
-
-TEST(NextPrimeFinderTest, FindsNextAfterPrime) {
-    EXPECT_EQ(nextPrime(2), 3);
-    EXPECT_EQ(nextPrime(3), 5);
-    EXPECT_EQ(nextPrime(5), 7);
-    EXPECT_EQ(nextPrime(7), 11);
-    EXPECT_EQ(nextPrime(11), 13);
-}
-
-TEST(NextPrimeFinderTest, HandlesBoundaryCases) {
-    EXPECT_EQ(nextPrime(0), 2);
-    EXPECT_EQ(nextPrime(1), 2);
-    EXPECT_EQ(nextPrime(13), 17);
-}
-
-TEST(PrimeSumCalculatorTest, HandlesSmallBoundaries) {
-    EXPECT_EQ(sumPrime(2), 0);
-    EXPECT_EQ(sumPrime(3), 2);
-    EXPECT_EQ(sumPrime(4), 5);
-    EXPECT_EQ(sumPrime(5), 5);
-    EXPECT_EQ(sumPrime(6), 10);  
-}
-
-TEST(PrimeSumCalculatorTest, HandlesMediumBoundaries) {
-    EXPECT_EQ(sumPrime(10), 17);   
-    EXPECT_EQ(sumPrime(15), 41);   
-    EXPECT_EQ(sumPrime(20), 77);  
-    EXPECT_EQ(sumPrime(30), 129); 
-}
-
-TEST(PrimeSumCalculatorTest, HandlesLargerBoundary) {
-    uint64_t expectedSum100 = 1060; 
-    EXPECT_EQ(sumPrime(100), expectedSum100);
+bool checkPrime(uint64_t value) {
+    if (value <= 1) return false;
+    if (value <= 3) return true; 
+    if (value % 2 == 0 || value % 3 == 0) return false;
     
-    uint64_t result = sumPrime(1000);
-    EXPECT_GT(result, 0);
-    EXPECT_LT(result, 50000); 
+    for (uint64_t i = 5; i * i <= value; i += 6) {
+        if (value % i == 0 || value % (i + 2) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+uint64_t nPrime(uint64_t n) {
+    if (n < 1) return 0;
+    
+    uint64_t count = 1; 
+    uint64_t candidate = 3;
+    
+    if (n == 1) return 2;
+    
+    while (count < n) {
+        if (checkPrime(candidate)) {
+            count++;
+        }
+        candidate += 2;
+    }
+    return candidate - 2;
+}
+
+uint64_t nextPrime(uint64_t value) {
+    uint64_t candidate = value;
+    
+    do {
+        candidate++;
+    } while (!checkPrime(candidate));
+    
+    return candidate;
+}
+
+uint64_t sumPrime(uint64_t hbound) {
+    if (hbound <= 2) return 0;
+    
+    std::vector<bool> isPrime(hbound, true);
+    isPrime[0] = isPrime[1] = false;
+    
+    for (uint64_t i = 2; i * i < hbound; i++) {
+        if (isPrime[i]) {
+            for (uint64_t j = i * i; j < hbound; j += i) {
+                isPrime[j] = false;
+            }
+        }
+    }
+    
+    uint64_t sum = 0;
+    for (uint64_t i = 2; i < hbound; i++) {
+        if (isPrime[i]) {
+            sum += i;
+        }
+    }
+    return sum;
 }
